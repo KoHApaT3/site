@@ -14,6 +14,11 @@ export default function CourseScreen({ route, navigation }: Props) {
       <FlatList
         data={course.lessons}
         keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <Pressable style={[styles.btn, styles.roadmapBtn]} onPress={() => navigation.navigate('Roadmap', { language: course.language })}>
+            <Text style={styles.btnText}>Дорожная карта</Text>
+          </Pressable>
+        }
         renderItem={({ item }) => (
           <View style={styles.lessonCard}>
             <Text style={styles.title}>{item.title}</Text>
@@ -30,6 +35,12 @@ export default function CourseScreen({ route, navigation }: Props) {
                 onPress={() => navigation.navigate('Quiz', { language: course.language, lessonId: item.id })}
               >
                 <Text style={styles.btnText}>Квиз</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.btn, styles.secondary]}
+                onPress={() => navigation.navigate('Practice', { language: course.language, lessonId: item.id })}
+              >
+                <Text style={styles.btnText}>Практика</Text>
               </Pressable>
             </View>
           </View>
@@ -49,9 +60,10 @@ const styles = StyleSheet.create({
   },
   title: { color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 6 },
   theory: { color: 'white', opacity: 0.9, marginBottom: 12 },
-  row: { flexDirection: 'row', gap: 12 },
-  btn: { paddingVertical: 10, paddingHorizontal: 14, borderRadius: 8 },
+  row: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
+  btn: { paddingVertical: 10, paddingHorizontal: 14, borderRadius: 8, marginRight: 8, marginTop: 8 },
   primary: { backgroundColor: '#1F4068' },
   secondary: { backgroundColor: '#1B1B2F' },
+  roadmapBtn: { backgroundColor: '#1F4068', marginBottom: 12, alignSelf: 'flex-start' },
   btnText: { color: 'white', fontWeight: '600' }
 });

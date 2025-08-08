@@ -6,6 +6,8 @@ import HomeScreen from './src/screens/HomeScreen';
 import CourseScreen from './src/screens/CourseScreen';
 import LessonScreen from './src/screens/LessonScreen';
 import QuizScreen from './src/screens/QuizScreen';
+import PracticeScreen from './src/screens/PracticeScreen';
+import RoadmapScreen from './src/screens/RoadmapScreen';
 import type { SupportedLanguage } from './src/types';
 
 export type RootStackParamList = {
@@ -13,6 +15,8 @@ export type RootStackParamList = {
   Course: { language: SupportedLanguage };
   Lesson: { language: SupportedLanguage; lessonId: string };
   Quiz: { language: SupportedLanguage; lessonId: string };
+  Practice: { language: SupportedLanguage; lessonId: string };
+  Roadmap: { language: SupportedLanguage };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -26,6 +30,8 @@ export default function App() {
         <Stack.Screen name="Course" component={CourseScreen} options={({ route }) => ({ title: route.params.language })} />
         <Stack.Screen name="Lesson" component={LessonScreen} options={{ title: 'Урок' }} />
         <Stack.Screen name="Quiz" component={QuizScreen} options={{ title: 'Квиз' }} />
+        <Stack.Screen name="Practice" component={PracticeScreen} options={{ title: 'Практика' }} />
+        <Stack.Screen name="Roadmap" component={RoadmapScreen} options={{ title: 'Дорожная карта' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

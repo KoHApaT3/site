@@ -5,11 +5,13 @@ import { RootStackParamList } from '../../App';
 import { courses } from '../data/courses';
 import { getProgress } from '../storage/progress';
 import { SupportedLanguage } from '../types';
+import { computeDbProgressByLanguage } from '../utils/topicProgress';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation }: Props) {
   const [progressText, setProgressText] = useState<Record<SupportedLanguage, string>>({} as any);
+  const [dbProgressText, setDbProgressText] = useState<Record<SupportedLanguage, string>>({} as any);
 
   useEffect(() => {
     const load = async () => {
@@ -21,6 +23,10 @@ export default function HomeScreen({ navigation }: Props) {
         return acc;
       }, {} as Record<SupportedLanguage, string>);
       setProgressText(result);
+
+      const db = computeDbProgressByLanguage(p, courses);
+      const dbText = Object.fromEntries(Object.entries(db).map(([k, v]) => [k, `${v}%`])) as Record<SupportedLanguage, string>;
+      setDbProgressText(dbText);
     };
     const unsubscribe = navigation.addListener('focus', load);
     load();
@@ -39,7 +45,7 @@ export default function HomeScreen({ navigation }: Props) {
             onPress={() => navigation.navigate('Course', { language: item.language })}
           >
             <Text style={styles.cardTitle}>{item.language}</Text>
-            <Text style={styles.cardSubtitle}>Прогресс: {progressText[item.language] ?? '0%'}</Text>
+            <Text style={styles.cardSubtitle}>Прогресс: {progressText[item.language] ?? '0%'} | БД: {dbProgressText[item.language] ?? '0%'}</Text>
           </Pressable>
         )}
       />

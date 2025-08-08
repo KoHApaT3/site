@@ -21,11 +21,15 @@ export type SupportedLanguage =
   | 'Bash'
   | 'MATLAB';
 
+export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced';
+
 export interface LessonContent {
   id: string;
   title: string;
   theory: string;
   codeExample: string;
+  difficulty?: Difficulty;
+  topics?: string[]; // e.g., ['DB', 'DB:Joins']
 }
 
 export interface QuizQuestion {
@@ -45,4 +49,14 @@ export interface CourseData {
 export interface ProgressState {
   completedLessons: Record<SupportedLanguage, Set<string>>;
   quizScores: Record<SupportedLanguage, Record<string, number>>; // lessonId -> percent
+}
+
+export interface PracticeTask {
+  id: string;
+  title: string;
+  prompt: string;
+  starter?: string;
+  language: SupportedLanguage;
+  lessonId: string;
+  check: (input: string) => { ok: boolean; feedback: string };
 }
