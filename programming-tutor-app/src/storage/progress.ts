@@ -16,7 +16,11 @@ const emptyProgress = (): ProgressState => {
     acc[lang] = {};
     return acc;
   }, {} as Record<SupportedLanguage, Record<string, number>>);
-  return { completedLessons, quizScores };
+  const practiceResults = languages.reduce((acc, lang) => {
+    acc[lang] = {};
+    return acc;
+  }, {} as Record<SupportedLanguage, Record<string, { lastOk: boolean; attempts: number }>>);
+  return { completedLessons, quizScores, practiceResults };
 };
 
 function serialize(state: ProgressState) {
@@ -24,7 +28,10 @@ function serialize(state: ProgressState) {
   const completedLessons = Object.fromEntries(
     languages.map((lang) => [lang, Array.from(state.completedLessons[lang] ?? new Set<string>())])
   ) as Record<SupportedLanguage, string[]>;
-  return JSON.stringify({ ...state, completedLessons });
+  const practiceResults = Object.fromEntries(
+    languages.map((lang) => [lang, state.practiceResults?.[lang] ?? {}])
+  ) as Record<SupportedLanguage, Record<string, { lastOk: boolean; attempts: number }>>;
+  return JSON.stringify({ ...state, completedLessons, practiceResults });
 }
 
 function deserialize(json: string | null): ProgressState {
@@ -39,7 +46,11 @@ function deserialize(json: string | null): ProgressState {
     acc[lang] = raw.quizScores?.[lang] ?? {};
     return acc;
   }, {} as Record<SupportedLanguage, Record<string, number>>);
-  return { completedLessons, quizScores } as ProgressState;
+  const practiceResults = languages.reduce((acc, lang) => {
+    acc[lang] = raw.practiceResults?.[lang] ?? {};
+    return acc;
+  }, {} as Record<SupportedLanguage, Record<string, { lastOk: boolean; attempts: number }>>);
+  return { completedLessons, quizScores, practiceResults } as ProgressState;
 }
 
 export async function getProgress(): Promise<ProgressState> {
@@ -56,5 +67,18 @@ export async function markLessonCompleted(language: SupportedLanguage, lessonId:
 export async function saveQuizScore(language: SupportedLanguage, lessonId: string, percent: number) {
   const state = await getProgress();
   state.quizScores[language][lessonId] = percent;
+  await AsyncStorage.setItem(STORAGE_KEY, serialize(state));
+}
+
+export async function savePracticeResult(language: SupportedLanguage, lessonId: string, ok: boolean) {
+  const state = await getProgress();
+  const currentLangMap = (state.practiceResults && state.practiceResults[language]) || {};
+  const entry = currentLangMap[lessonId] ?? { lastOk: false, attempts: 0 };
+  const updated = { lastOk: ok, attempts: entry.attempts + 1 };
+  const newPracticeResults = {
+    ...(state.practiceResults ?? {}),
+    [language]: { ...currentLangMap, [lessonId]: updated }
+  } as Record<SupportedLanguage, Record<string, { lastOk: boolean; attempts: number }>>;
+  state.practiceResults = newPracticeResults;
   await AsyncStorage.setItem(STORAGE_KEY, serialize(state));
 }

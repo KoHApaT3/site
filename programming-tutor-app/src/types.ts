@@ -21,7 +21,7 @@ export type SupportedLanguage =
   | 'Bash'
   | 'MATLAB';
 
-export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced';
+export type Difficulty = 'Intro' | 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
 
 export interface LessonContent {
   id: string;
@@ -49,6 +49,7 @@ export interface CourseData {
 export interface ProgressState {
   completedLessons: Record<SupportedLanguage, Set<string>>;
   quizScores: Record<SupportedLanguage, Record<string, number>>; // lessonId -> percent
+  practiceResults?: Record<SupportedLanguage, Record<string, { lastOk: boolean; attempts: number }>>;
 }
 
 export interface PracticeTask {

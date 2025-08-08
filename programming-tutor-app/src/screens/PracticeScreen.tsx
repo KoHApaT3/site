@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, Pressable, Alert, ScrollView } from 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { findPracticeTask } from '../data/practice';
+import { savePracticeResult } from '../storage/progress';
 
  type Props = NativeStackScreenProps<RootStackParamList, 'Practice'>;
 
@@ -11,9 +12,10 @@ export default function PracticeScreen({ route }: Props) {
   const task = useMemo(() => findPracticeTask(language, lessonId), [language, lessonId]);
   const [code, setCode] = useState(task?.starter ?? '');
 
-  const run = () => {
+  const run = async () => {
     if (!task) return;
     const res = task.check(code);
+    await savePracticeResult(language, lessonId, res.ok);
     if (res.ok) Alert.alert('Успех', res.feedback);
     else Alert.alert('Почти', res.feedback);
   };

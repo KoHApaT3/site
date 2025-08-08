@@ -15,6 +15,19 @@ export const practiceTasks: PracticeTask[] = [
     }
   },
   {
+    id: 'py-sum',
+    title: 'Сумма чисел',
+    prompt: 'Создайте список [1,2,3] и выведите сумму элементов',
+    starter: "# Ваш код ниже\n",
+    language: 'Python',
+    lessonId: 'py-2',
+    check: (input) => {
+      const n = input.replace(/\s+/g, '').toLowerCase();
+      const ok = n.includes('sum([') || (n.includes('nums=[') && n.includes('sum(nums)'));
+      return { ok, feedback: ok ? 'Верно!' : 'Подсказка: используйте sum([...])' };
+    }
+  },
+  {
     id: 'js-hello',
     title: 'Привет, мир!',
     prompt: 'Напишите программу, которая выводит Hello, World в консоль',
@@ -28,19 +41,6 @@ export const practiceTasks: PracticeTask[] = [
     }
   },
   {
-    id: 'sql-filter',
-    title: 'Фильтрация пользователей 18+',
-    prompt: 'Напишите SELECT, который выбирает колонки name, age из таблицы users только для age >= 18',
-    starter: 'SELECT name, age FROM users WHERE ',
-    language: 'SQL',
-    lessonId: 'sql-1',
-    check: (input) => {
-      const n = input.replace(/\s+/g, '').toLowerCase();
-      const ok = n.startsWith('select') && n.includes('fromusers') && n.includes('name,age'.replace(',', '')) && (n.includes('age>=18') || n.includes('age>17'));
-      return { ok, feedback: ok ? 'Верно!' : 'Убедитесь, что указали SELECT name, age FROM users WHERE age >= 18' };
-    }
-  },
-  {
     id: 'ts-interface',
     title: 'Интерфейс User',
     prompt: 'Опишите интерфейс User с полями name:string и age:number',
@@ -51,6 +51,32 @@ export const practiceTasks: PracticeTask[] = [
       const n = input.replace(/\s+/g, '').toLowerCase();
       const ok = n.includes('interfaceuser{') && n.includes('name:string') && n.includes('age:number');
       return { ok, feedback: ok ? 'Правильно.' : 'Добавьте interface User { name: string; age: number }' };
+    }
+  },
+  {
+    id: 'sql-filter',
+    title: 'Фильтрация пользователей 18+',
+    prompt: 'Напишите SELECT, который выбирает колонки name, age из таблицы users только для age >= 18',
+    starter: 'SELECT name, age FROM users WHERE ',
+    language: 'SQL',
+    lessonId: 'sql-1',
+    check: (input) => {
+      const n = input.replace(/\s+/g, '').toLowerCase();
+      const ok = n.startsWith('select') && n.includes('fromusers') && (n.includes('age>=18') || n.includes('age>17'));
+      return { ok, feedback: ok ? 'Верно!' : 'Убедитесь, что указали SELECT name, age FROM users WHERE age >= 18' };
+    }
+  },
+  {
+    id: 'sql-join',
+    title: 'Соединение пользователей и заказов',
+    prompt: 'Выберите u.name и o.id из users u и orders o через INNER JOIN по user_id',
+    starter: 'SELECT ',
+    language: 'SQL',
+    lessonId: 'sql-2',
+    check: (input) => {
+      const n = input.replace(/\s+/g, '').toLowerCase();
+      const ok = n.includes('select') && n.includes('fromusersuinnerjoinorderso') && n.includes('ono.user_id=u.id');
+      return { ok, feedback: ok ? 'Отлично!' : 'Подсказка: FROM users u INNER JOIN orders o ON o.user_id = u.id' };
     }
   }
 ];
