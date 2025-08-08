@@ -6,12 +6,13 @@ import HomeScreen from './src/screens/HomeScreen';
 import CourseScreen from './src/screens/CourseScreen';
 import LessonScreen from './src/screens/LessonScreen';
 import QuizScreen from './src/screens/QuizScreen';
+import type { SupportedLanguage } from './src/types';
 
 export type RootStackParamList = {
   Home: undefined;
-  Course: { language: 'Dart' | 'Python' | 'JavaScript' };
-  Lesson: { language: 'Dart' | 'Python' | 'JavaScript'; lessonId: string };
-  Quiz: { language: 'Dart' | 'Python' | 'JavaScript'; lessonId: string };
+  Course: { language: SupportedLanguage };
+  Lesson: { language: SupportedLanguage; lessonId: string };
+  Quiz: { language: SupportedLanguage; lessonId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

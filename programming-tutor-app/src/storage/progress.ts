@@ -1,43 +1,45 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProgressState, SupportedLanguage } from '../types';
+import { courses } from '../data/courses';
 
 const STORAGE_KEY = 'progress_state_v1';
 
-const emptyProgress = (): ProgressState => ({
-  completedLessons: {
-    Dart: new Set<string>(),
-    Python: new Set<string>(),
-    JavaScript: new Set<string>()
-  },
-  quizScores: {
-    Dart: {},
-    Python: {},
-    JavaScript: {}
-  }
-});
+const getLanguages = (): SupportedLanguage[] => courses.map((c) => c.language);
+
+const emptyProgress = (): ProgressState => {
+  const languages = getLanguages();
+  const completedLessons = languages.reduce((acc, lang) => {
+    acc[lang] = new Set<string>();
+    return acc;
+  }, {} as Record<SupportedLanguage, Set<string>>);
+  const quizScores = languages.reduce((acc, lang) => {
+    acc[lang] = {};
+    return acc;
+  }, {} as Record<SupportedLanguage, Record<string, number>>);
+  return { completedLessons, quizScores };
+};
 
 function serialize(state: ProgressState) {
-  return JSON.stringify({
-    ...state,
-    completedLessons: {
-      Dart: Array.from(state.completedLessons.Dart),
-      Python: Array.from(state.completedLessons.Python),
-      JavaScript: Array.from(state.completedLessons.JavaScript)
-    }
-  });
+  const languages = getLanguages();
+  const completedLessons = Object.fromEntries(
+    languages.map((lang) => [lang, Array.from(state.completedLessons[lang] ?? new Set<string>())])
+  ) as Record<SupportedLanguage, string[]>;
+  return JSON.stringify({ ...state, completedLessons });
 }
 
 function deserialize(json: string | null): ProgressState {
+  const languages = getLanguages();
   if (!json) return emptyProgress();
   const raw = JSON.parse(json);
-  return {
-    completedLessons: {
-      Dart: new Set<string>(raw.completedLessons?.Dart ?? []),
-      Python: new Set<string>(raw.completedLessons?.Python ?? []),
-      JavaScript: new Set<string>(raw.completedLessons?.JavaScript ?? [])
-    },
-    quizScores: raw.quizScores ?? { Dart: {}, Python: {}, JavaScript: {} }
-  } as ProgressState;
+  const completedLessons = languages.reduce((acc, lang) => {
+    acc[lang] = new Set<string>(raw.completedLessons?.[lang] ?? []);
+    return acc;
+  }, {} as Record<SupportedLanguage, Set<string>>);
+  const quizScores = languages.reduce((acc, lang) => {
+    acc[lang] = raw.quizScores?.[lang] ?? {};
+    return acc;
+  }, {} as Record<SupportedLanguage, Record<string, number>>);
+  return { completedLessons, quizScores } as ProgressState;
 }
 
 export async function getProgress(): Promise<ProgressState> {

@@ -9,21 +9,17 @@ import { SupportedLanguage } from '../types';
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation }: Props) {
-  const [progressText, setProgressText] = useState<Record<SupportedLanguage, string>>({
-    Dart: '—',
-    Python: '—',
-    JavaScript: '—'
-  });
+  const [progressText, setProgressText] = useState<Record<SupportedLanguage, string>>({} as any);
 
   useEffect(() => {
     const load = async () => {
       const p = await getProgress();
-      const result: Record<SupportedLanguage, string> = { Dart: '0%', Python: '0%', JavaScript: '0%' } as any;
-      for (const course of courses) {
+      const result = courses.reduce((acc, course) => {
         const done = p.completedLessons[course.language].size;
-        const total = course.lessons.length;
-        result[course.language] = `${Math.round((done / total) * 100)}%`;
-      }
+        const total = course.lessons.length || 1;
+        acc[course.language] = `${Math.round((done / total) * 100)}%`;
+        return acc;
+      }, {} as Record<SupportedLanguage, string>);
       setProgressText(result);
     };
     const unsubscribe = navigation.addListener('focus', load);
@@ -43,7 +39,7 @@ export default function HomeScreen({ navigation }: Props) {
             onPress={() => navigation.navigate('Course', { language: item.language })}
           >
             <Text style={styles.cardTitle}>{item.language}</Text>
-            <Text style={styles.cardSubtitle}>Прогресс: {progressText[item.language]}</Text>
+            <Text style={styles.cardSubtitle}>Прогресс: {progressText[item.language] ?? '0%'}</Text>
           </Pressable>
         )}
       />
