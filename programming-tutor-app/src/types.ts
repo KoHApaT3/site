@@ -1,4 +1,25 @@
-export type SupportedLanguage = 'Dart' | 'Python' | 'JavaScript' | 'TypeScript' | 'Java' | 'C#' | 'Go' | 'Rust' | 'Kotlin' | 'Swift' | 'C++';
+export type SupportedLanguage =
+  | 'Dart'
+  | 'Python'
+  | 'JavaScript'
+  | 'TypeScript'
+  | 'Java'
+  | 'C#'
+  | 'Go'
+  | 'Rust'
+  | 'Kotlin'
+  | 'Swift'
+  | 'C++'
+  | 'PHP'
+  | 'Ruby'
+  | 'Scala'
+  | 'C'
+  | 'Haskell'
+  | 'Elixir'
+  | 'SQL'
+  | 'R'
+  | 'Bash'
+  | 'MATLAB';
 
 export interface LessonContent {
   id: string;
