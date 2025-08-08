@@ -1,0 +1,95 @@
+import React from 'react';
+import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../App';
+import { courses } from '../data/courses';
+import { getLessonDifficultyById } from '../utils/difficulty';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Course'>;
+
+export default function CourseScreen({ route, navigation }: Props) {
+  const course = courses.find((c) => c.language === route.params.language)!;
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={course.lessons}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <Pressable style={[styles.btn, styles.roadmapBtn]} onPress={() => navigation.navigate('Roadmap', { language: course.language })}>
+            <Text style={styles.btnText}>Дорожная карта</Text>
+          </Pressable>
+        }
+        renderItem={({ item }) => {
+          const diff = getLessonDifficultyById(item.id);
+          return (
+            <View style={styles.lessonCard}>
+              <View style={styles.headerRow}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={[styles.badge, badgeStyle(diff)]}>{diff}</Text>
+              </View>
+              <Text style={styles.theory} numberOfLines={3}>{item.theory}</Text>
+              <View style={styles.row}>
+                <Pressable
+                  style={[styles.btn, styles.primary]}
+                  onPress={() => navigation.navigate('Lesson', { language: course.language, lessonId: item.id })}
+                >
+                  <Text style={styles.btnText}>Читать</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.btn, styles.secondary]}
+                  onPress={() => navigation.navigate('Quiz', { language: course.language, lessonId: item.id })}
+                >
+                  <Text style={styles.btnText}>Квиз</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.btn, styles.secondary]}
+                  onPress={() => navigation.navigate('Practice', { language: course.language, lessonId: item.id })}
+                >
+                  <Text style={styles.btnText}>Практика</Text>
+                </Pressable>
+              </View>
+            </View>
+          );
+        }}
+      />
+    </View>
+  );
+}
+
+function badgeStyle(diff: string) {
+  switch (diff) {
+    case 'Intro':
+      return { backgroundColor: '#2D6A4F' };
+    case 'Beginner':
+      return { backgroundColor: '#1F7A8C' };
+    case 'Intermediate':
+      return { backgroundColor: '#E1AD01' };
+    case 'Advanced':
+      return { backgroundColor: '#C84C09' };
+    case 'Expert':
+      return { backgroundColor: '#6A040F' };
+    default:
+      return { backgroundColor: '#444' };
+  }
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16 },
+  lessonCard: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#162447',
+    marginBottom: 12
+  },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  title: { color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 6 },
+  theory: { color: 'white', opacity: 0.9, marginBottom: 12 },
+  row: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
+  btn: { paddingVertical: 10, paddingHorizontal: 14, borderRadius: 8, marginRight: 8, marginTop: 8 },
+  primary: { backgroundColor: '#1F4068' },
+  secondary: { backgroundColor: '#1B1B2F' },
+  roadmapBtn: { backgroundColor: '#1F4068', marginBottom: 12, alignSelf: 'flex-start' },
+  btnText: { color: 'white', fontWeight: '600' },
+  badge: { color: 'white', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, overflow: 'hidden', marginLeft: 8 }
+});
